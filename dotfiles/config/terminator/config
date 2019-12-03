@@ -1,0 +1,27 @@
+[global_config]
+  handle_size = 2
+  extra_styling = False
+  inactive_color_offset = 0.8
+  title_use_system_font = False
+[keybindings]
+[profiles]
+  [[default]]
+    background_color = "{{@@ border_color @@}}"
+    cursor_shape = underline
+    cursor_color = "{{@@ font_color @@}}"
+    font = {{@@ font_family @@}} {{@@ font_size_default @@}}
+    foreground_color = "{{@@ font_color @@}}"
+    show_titlebar = False
+    scrollbar_position = hidden
+    scrollback_lines = 10000
+    use_system_font = False
+    copy_on_selection = True
+[layouts]
+  [[default]]
+    [[[child1]]]
+      parent = window0
+      type = Terminal
+    [[[window0]]]
+      parent = ""
+      type = Window
+[plugins]

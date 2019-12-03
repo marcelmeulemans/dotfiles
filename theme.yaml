@@ -1,0 +1,14 @@
+variables:
+    lock_timeout: 120
+    backgrond_image: 'nature-1542564346466-7078.jpg'
+    #backgrond_image: 'sunset-1542564132735-6046.jpg'
+    font_family: 'Hack'
+    font_size_small: 6
+    font_size_default: 8
+    border_color: "#222222"
+    font_color: "#f7f7f7"
+    background_color: "#666666"
+    highlight_color: "#9a3c22"
+    good_color: "#26A65B"
+    warning_color: "#dd8529"
+    error_color: "#dd3a29"

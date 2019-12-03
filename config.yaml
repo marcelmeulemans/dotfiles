@@ -1,0 +1,37 @@
+config:
+  backup: true
+  create: true
+  dotpath: dotfiles
+  import_variables:
+  - theme.yaml
+dotfiles:
+  f_config:
+    src: config/sway/config
+    dst: ~/.config/sway/config
+  d_waybar:
+    src: config/waybar
+    dst: ~/.config/waybar
+  f_mako_config:
+    src: config/mako/config
+    dst: ~/.config/mako/config
+  f_terminator_config:
+    src: config/terminator/config
+    dst: ~/.config/terminator/config
+  d_nvim:
+    src: config/nvim
+    dst: ~/.config/nvim
+profiles:
+  mm:
+    dotfiles:
+    - f_config
+    - d_waybar
+    - f_mako_config
+    - f_terminator_config
+    - d_nvim
+    actions:
+    - copy_bg
+actions:
+  pre:
+    copy_bg: cp {{@@ _dotdrop_dotpath @@}}/bgs/{{@@ backgrond_image @@}} ~/.config/bg.jpg
+      && convert -brightness-contrast -10x0 -blur 10x10 {{@@ _dotdrop_dotpath @@}}/bgs/{{@@
+      backgrond_image @@}} ~/.config/lock.jpg

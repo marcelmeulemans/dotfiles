@@ -1,0 +1,11 @@
+max-visible=10
+font={{@@ font_family @@}} {{@@ font_size_default @@}}
+default-timeout=10000
+text-color={{@@ font_color @@}}
+border-color={{@@ border_color @@}}
+background-color={{@@ border_color @@}}
+width=400
+height=100
+format=<b>%s</b>\n\n%b
+margin=4
+padding=10
