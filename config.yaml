@@ -20,6 +20,15 @@ dotfiles:
   d_nvim:
     src: config/nvim
     dst: ~/.config/nvim
+  f_zshrc:
+    src: zshrc
+    dst: ~/.zshrc
+    actions:
+    - check_git
+    - check_zsh
+    - install_z
+    - install_fzf
+    - install_oh_my_zsh
 profiles:
   mm:
     dotfiles:
@@ -28,10 +37,15 @@ profiles:
     - f_mako_config
     - f_terminator_config
     - d_nvim
+    - f_zshrc
     actions:
     - copy_bg
 actions:
   pre:
-    copy_bg: cp {{@@ _dotdrop_dotpath @@}}/bgs/{{@@ backgrond_image @@}} ~/.config/bg.jpg
-      && convert -brightness-contrast -10x0 -blur 10x10 {{@@ _dotdrop_dotpath @@}}/bgs/{{@@
-      backgrond_image @@}} ~/.config/lock.jpg
+    copy_bg: cp {{@@ _dotdrop_dotpath @@}}/bgs/{{@@ backgrond_image @@}} ~/.config/bg.jpg && convert -brightness-contrast -10x0 -blur 10x10 {{@@ _dotdrop_dotpath @@}}/bgs/{{@@backgrond_image @@}} ~/.config/lock.jpg
+    check_git: dpkg -s git | grep installed
+    check_zsh: dpkg -s zsh | grep installed
+  post:
+    install_fzf: if [ ! -d ~/.fzf ]; then git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf; bash ~/.fzf/install --key-bindings --completion --no-update-rc; fi
+    install_oh_my_zsh: if [ ! -d ~/.oh-my-zsh ]; then sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; fi
+    install_z: if [ ! -f ~/.bin/z ]; then mkdir -p ~/bin && curl -s -o ~/bin/z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh; fi

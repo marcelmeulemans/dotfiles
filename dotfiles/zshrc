@@ -1,0 +1,168 @@
+# If you come from bash you might have to change your $PATH.
+export PATH=$HOME/bin:$HOME/.local/bin:$PATH
+
+# Path to your oh-my-zsh installation.
+export ZSH="/home/mmeulemans/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time oh-my-zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+ZSH_THEME="agnoster"
+
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in ~/.oh-my-zsh/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(
+  git
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+# ssh
+# export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+
+alias g='git'
+alias d='docker'
+alias newpw='pwgen -s -y 32 1 | tr -d "\n" | xclip -sel clip && echo "New password copied to clipboard."'
+alias yr='yarn -s run'
+alias l='ls -alh'
+alias top='htop'
+alias P='ping 1.1.1.1'
+alias gk='gitk --all'
+alias gg='git gui'
+alias less='bat --style=numbers --theme=zenburn'
+alias dr='docker run --rm -ti'
+alias kc='~/bin/kubect.git/kubectx'
+alias show='pandoc $1 | lynx -stdin'
+
+function dr() {
+    docker run --rm -ti nexus.tkhinnovations.com/$@
+}
+
+function dl() {
+    local CONTAINER=$(docker ps | grep $1 | awk '{print $1}')
+    if [ -n "${CONTAINER}" ]; then
+        docker logs -f ${CONTAINER}
+    else 
+        echo "No matching container found" >&2
+    fi
+}
+
+function _find_pod() {
+    local pattern="$1"
+}
+
+function _find_matching_pod() {
+    local pattern="$1"
+    local pods=$(kubectl get pods --all-namespaces -o go-template --template '{{range .items}}{{$label := index .metadata.labels "app.kubernetes.io/component"}} {{if $label}}{{$label}}{{else}}--------------------{{end}} {{.metadata.name}} {{.metadata.namespace}}{{"\n"}}{{end}}')
+    local ranking=$(echo "{$pods}" | awk -v REGEX="${pattern}" '{where = match($0, REGEX); if (where > 0) { printf("%03d %s\n", where, $0); } }' | sort)
+    local best=$(echo "${ranking}" | head -n 1 | awk '{ printf("%s %s\n", $3, $4) }')
+    echo "${best}"
+}
+
+function pf() {
+    local pattern="$1"
+    local port="$2"
+    if [ -n "$pattern" -a -n "$port" ]; then
+        local details=$(_find_matching_pod $pattern)
+        local pod=$(echo "$details" | awk '{print $1}')
+        local namespace=$(echo "$details" | awk '{print $2}')
+        if [ -n "$pod" -a -n "$namespace" ]; then
+            echo "Forwarding to $pod:$port in namespace $namespace"
+            kubectl port-forward -n $namespace $pod $port
+        else
+            echo "No pod matching $pattern found"
+        fi
+    else
+        echo "Usage: $0 <pod> <port>"
+    fi
+}
+
+# Enable fuzzy history search
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Enable z cd
+source ~/bin/z.sh
+
+# Source local rc
+if [ -f ~/.zshrc_local ]; then
+    source ~/.zshrc_local
+fi
+
